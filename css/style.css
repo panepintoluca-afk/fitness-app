@@ -1,0 +1,313 @@
+/* ==========================================================================
+   Fapp — stili
+   Target: iPhone 15 Pro, viewport 393×852 pt (vedi CLAUDE.md)
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Colori */
+  --bg: #000;                   /* sfondo quasi nero (OLED) */
+  --bg-elevato: #1c1c1e;        /* card */
+  --bg-elevato-2: #2c2c2e;      /* elementi dentro le card, input */
+  --separatore: rgba(84, 84, 88, 0.6);
+  --fg: #fff;
+  --fg-2: rgba(235, 235, 245, 0.6);   /* testo secondario */
+  --fg-3: rgba(235, 235, 245, 0.3);   /* placeholder */
+  --accento: #0a84ff;           /* unico colore d'accento */
+  --accento-tenue: rgba(10, 132, 255, 0.15);
+  --verde: #30d158;             /* serie completata */
+  --verde-tenue: rgba(48, 209, 88, 0.18);
+  --oro: #ffd60a;               /* PR */
+  --rosso: #ff453a;             /* azioni distruttive */
+  --vetro: rgba(22, 22, 24, 0.82);    /* barre con blur */
+
+  /* iPhone 15 Pro — viewport CSS portrait 393×852 pt, DPR 3 */
+  --screen-w: 393px;
+  --screen-h: 852px;
+  --gutter: 16px;               /* margine laterale → 361px utili */
+  --tap-min: 44px;              /* target touch minimo Apple HIG */
+  --tabbar-h: 49px;             /* altezza tab bar iOS, + safe area bottom */
+  --navbar-h: 44px;
+  --safe-top: env(safe-area-inset-top, 0px);       /* ~59px sul 15 Pro */
+  --safe-bottom: env(safe-area-inset-bottom, 0px); /* ~34px sul 15 Pro */
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --raggio: 12px;
+  --raggio-grande: 16px;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+/* ---------- Reset e base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;                 /* scrolla solo la schermata, non la pagina */
+  overscroll-behavior: none;        /* niente pull-to-refresh / bounce della pagina */
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.35 var(--font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;       /* niente zoom con doppio tap */
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { -webkit-user-select: none; user-select: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p { margin: 0; }
+[hidden] { display: none !important; }
+
+/* Input ≥ 16px: sotto iOS fa lo zoom automatico al focus */
+input, select, textarea { font-size: max(16px, 1em); }
+
+.icona { width: 1.2em; height: 1.2em; flex: none; }
+
+/* ---------- Shell ---------- */
+
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Fascia sotto la status bar / Dynamic Island: il contenuto che scorre ci passa sotto sfumato. */
+#app::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--safe-top);
+  background: var(--vetro);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+#viste {
+  position: absolute;
+  inset: 0;
+}
+
+.schermata {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg);
+  padding-top: var(--safe-top);
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom) + var(--gutter));
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  will-change: transform;
+}
+.schermata.nascosta { visibility: hidden; pointer-events: none; }
+body.schermo-intero .schermata { padding-bottom: calc(var(--safe-bottom) + var(--gutter)); }
+
+.contenuto {
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- Intestazioni ---------- */
+
+.intestazione { padding: 8px var(--gutter) 12px; }
+
+.titolo-grande {
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--navbar-h);
+  padding: 0 8px;
+  margin-bottom: 8px;
+  background: var(--vetro);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 0.5px solid var(--separatore);
+}
+.navbar-indietro {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--tap-min);
+  padding: 0 8px 0 0;
+  border: 0;
+  background: none;
+  color: var(--accento);
+  font-size: 17px;
+}
+.navbar-indietro .icona { width: 24px; height: 24px; stroke-width: 2.5; }
+.navbar-titolo { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.navbar-azione { justify-self: end; }
+
+.sezione-testata {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+.sezione-titolo { font-size: 22px; font-weight: 700; }
+.contenuto > .sezione-titolo { margin-top: 8px; }
+
+/* ---------- Bottoni ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tap-min);
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--raggio);
+  font-size: 17px;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.btn:active:not(:disabled) { opacity: 0.7; transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.btn-primario { background: var(--accento); color: #fff; }
+.btn-secondario { background: var(--bg-elevato); color: var(--accento); }
+.btn-testo { background: none; color: var(--accento); padding: 0 8px; }
+.btn-distruttivo { background: var(--bg-elevato); color: var(--rosso); }
+.btn-largo { width: 100%; min-height: 52px; }
+
+.riga-bottoni { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ---------- Card e liste ---------- */
+
+.card {
+  background: var(--bg-elevato);
+  border-radius: var(--raggio-grande);
+  padding: 16px;
+}
+.card.vuoto { text-align: center; color: var(--fg); padding: 28px 16px; }
+.card.vuoto p + p { margin-top: 4px; }
+
+.testo-secondario { color: var(--fg-2); font-size: 15px; }
+.nota-piccola { color: var(--fg-2); font-size: 13px; padding: 0 16px; }
+
+/* Lista raggruppata stile Impostazioni iOS */
+.gruppo {
+  background: var(--bg-elevato);
+  border-radius: var(--raggio);
+  overflow: hidden;
+}
+.riga {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--tap-min);
+  padding: 11px 16px;
+  position: relative;
+}
+.riga + .riga::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  left: 16px;
+  border-top: 0.5px solid var(--separatore);
+}
+a.riga:active { background: var(--bg-elevato-2); }
+.riga-icona {
+  display: grid; place-items: center;
+  width: 29px; height: 29px;
+  border-radius: 7px;
+  background: #636366;
+  color: #fff;
+}
+.riga-icona .icona { width: 18px; height: 18px; }
+.riga-testo { flex: 1; min-width: 0; }
+.riga-valore { color: var(--fg-2); font-variant-numeric: tabular-nums; text-align: right; }
+.riga-freccia { color: var(--fg-3); display: flex; }
+.riga-freccia .icona { width: 18px; height: 18px; stroke-width: 2.5; }
+
+/* ---------- Campi ---------- */
+
+.campo-ricerca {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--bg-elevato-2);
+  color: var(--fg-2);
+}
+.campo-ricerca input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  outline: none;
+  color: var(--fg);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.campo-ricerca input::placeholder { color: var(--fg-2); }
+
+/* ---------- Tab bar ---------- */
+
+.tabbar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: calc(var(--tabbar-h) + var(--safe-bottom));
+  padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background: var(--vetro);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-top: 0.5px solid var(--separatore);
+}
+body.schermo-intero .tabbar { display: none; }
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--tabbar-h);
+  color: #8e8e93;
+  font-size: 10px;
+  font-weight: 500;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.tab .icona { width: 26px; height: 26px; }
+.tab.attiva { color: var(--accento); }
+.tab:active .icona { transform: scale(0.92); }
+
+/* ---------- Accessibilità ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
